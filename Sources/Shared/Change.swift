@@ -9,13 +9,21 @@
 import Foundation
 
 public struct Insert<T> {
-  public let item: T
-  public let index: Int
+    public let item: T
+    public let index: Int
+    public init(item: T, index: Int) {
+        self.index = index
+        self.item = item
+    }
 }
 
 public struct Delete<T> {
-  public let item: T
-  public let index: Int
+    public let item: T
+    public let index: Int
+    public init(item: T, index: Int) {
+        self.index = index
+        self.item = item
+    }
 }
 
 public struct Replace<T> {
