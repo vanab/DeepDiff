@@ -29,12 +29,17 @@ public extension UICollectionView {
     performBatchUpdates({
       updateData()
       insideUpdate(changesWithIndexPath: changesWithIndexPath)
+        if #available(iOS 15, *) {
+            self.reconfigureItems(at: changesWithIndexPath.replaces)
+        }
     }, completion: { finished in
       completion?(finished)
     })
 
     // reloadRows needs to be called outside the batch
-    outsideUpdate(changesWithIndexPath: changesWithIndexPath)
+        if #unavailable(iOS 15) {
+            outsideUpdate(changesWithIndexPath: changesWithIndexPath)
+        }
   }
   
   // MARK: - Helper
