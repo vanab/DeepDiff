@@ -18,29 +18,33 @@ public extension UICollectionView {
   ///   - section: The section that all calculated IndexPath belong
   ///   - updateData: Update your data source model
   ///   - completion: Called when operation completes
-  func reload<T: DiffAware>(
-    changes: [Change<T>],
-    section: Int = 0,
-    updateData: () -> Void,
-    completion: ((Bool) -> Void)? = nil) {
-    
-    let changesWithIndexPath = IndexPathConverter().convert(changes: changes, section: section)
-    
-    performBatchUpdates({
-      updateData()
-      insideUpdate(changesWithIndexPath: changesWithIndexPath)
-        if #available(iOS 15, *) {
-            self.reconfigureItems(at: changesWithIndexPath.replaces)
-        }
-    }, completion: { finished in
-      completion?(finished)
-    })
+    func reload<T: DiffAware>(
+      changes: [Change<T>],
+      section: Int = 0,
+      updateData: () -> Void,
+      completion: ((Bool) -> Void)? = nil,
+      forceReload: Bool = false) {
+      
+      let changesWithIndexPath = IndexPathConverter().convert(changes: changes, section: section)
+      
+      performBatchUpdates({
+        updateData()
+        insideUpdate(changesWithIndexPath: changesWithIndexPath)
+          if #available(iOS 15, *), !forceReload {
+              self.reconfigureItems(at: changesWithIndexPath.replaces)
+          }
+      }, completion: { finished in
+        completion?(finished)
+      })
 
-    // reloadRows needs to be called outside the batch
-        if #unavailable(iOS 15) {
-            outsideUpdate(changesWithIndexPath: changesWithIndexPath)
-        }
-  }
+      // reloadRows needs to be called outside the batch
+          if #unavailable(iOS 15) {
+              outsideUpdate(changesWithIndexPath: changesWithIndexPath)
+          }
+          else if forceReload {
+              outsideUpdate(changesWithIndexPath: changesWithIndexPath)
+          }
+    }
   
   // MARK: - Helper
   
